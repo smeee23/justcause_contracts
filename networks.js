@@ -20,7 +20,7 @@ if (!isTestEnvironment && !PRIVATE_KEY) {
 
 const networks = {
   polygon: {
-    url: "https://polygon-mainnet.infura.io/v3/c6e0956c0fb4432aac74aaa7dfb7687e",
+    url: process.env.POLYGON_MAINNET_RPC_URL,
     accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     chainId: 137,
     confirmations: DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS,
@@ -30,7 +30,7 @@ const networks = {
     multiSig: "0xed8C646e1d73847dBb799D39f193C185D6A8A010",
   },
   polygon_mumbai: {
-    url: "https://polygon-mumbai.infura.io/v3/c6e0956c0fb4432aac74aaa7dfb7687e",
+    url: process.env.POLYGON_MUMBAI_RPC_URL,
     accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     chainId: 80001,
     confirmations: DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS,
@@ -40,7 +40,7 @@ const networks = {
     multiSig: "0x78726673245fdb56425c8bd782f6FaA3E447625A",
   },
   arbitrum: {
-    url: "https://arbitrum-mainnet.infura.io/v3/c6e0956c0fb4432aac74aaa7dfb7687e",
+    url: process.env.ARBITRUM_MAINNET_RPC_URL,
     accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     chainId: 42161,
     confirmations: 2,
@@ -50,7 +50,7 @@ const networks = {
     multiSig: "",
   },
   arbitrum_goerli: {
-    url: "https://arbitrum-goerli.infura.io/v3/c6e0956c0fb4432aac74aaa7dfb7687e",
+    url: process.env.ARBITRUM_GOERLI_RPC_URL,
     accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     chainId: 421613,
     confirmations: 2,
