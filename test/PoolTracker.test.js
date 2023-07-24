@@ -456,7 +456,7 @@ contract("Pool Tracker", async (accounts) => {
     it("getBpFee returns fee", async() => {
         await this.poolTracker.setBpFee(2, {from: multiSig});
         fee = (await this.poolTracker.getBpFee()).toString();
-        assert.strictEqual(fee, "20", "multiSig not correct");
+        assert.strictEqual(fee, "50", "multiSig not correct");
     });
 
     it("setBpFee changes fee", async() => {
@@ -465,21 +465,21 @@ contract("Pool Tracker", async (accounts) => {
         assert.strictEqual(fee, "0", "multiSig not correct");
         await this.poolTracker.setBpFee(1, {from: multiSig});
         fee = (await this.poolTracker.getBpFee()).toString();
-        assert.strictEqual(fee, "10", "multiSig not correct");
+        assert.strictEqual(fee, "20", "multiSig not correct");
         await this.poolTracker.setBpFee(2, {from: multiSig});
         fee = (await this.poolTracker.getBpFee()).toString();
-        assert.strictEqual(fee, "20", "multiSig not correct");
+        assert.strictEqual(fee, "50", "multiSig not correct");
         await this.poolTracker.setBpFee(3, {from: multiSig});
         fee = (await this.poolTracker.getBpFee()).toString();
-        assert.strictEqual(fee, "30", "multiSig not correct");
+        assert.strictEqual(fee, "80", "multiSig not correct");
         await this.poolTracker.setBpFee(4, {from: multiSig});
         fee = (await this.poolTracker.getBpFee()).toString();
-        assert.strictEqual(fee, "40", "multiSig not correct");
+        assert.strictEqual(fee, "100", "multiSig not correct");
     });
 
     it("setBpFee throws error when fee index out of bounds", async() => {
         await expectRevert(
-            this.poolTracker.setBpFee(5, {from: multiSig}),
+            this.poolTracker.setBpFee(9, {from: multiSig}),
             "VM Exception while processing transaction: reverted with panic code 0x32 (Array accessed at an out-of-bounds or negative index)"
         );
     });

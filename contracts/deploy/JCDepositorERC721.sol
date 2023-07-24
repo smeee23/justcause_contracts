@@ -64,7 +64,7 @@ contract JCDepositorERC721 is ERC721URIStorageUpgradeable {
         uint256 _amount,
         uint256 _timeStamp,
         address _asset,
-        string memory _metaUri
+        string calldata _metaUri
     ) public onlyPoolTracker returns (bool) {
 
         //tokenId is keccak hash of depositor, pool and asset addresses

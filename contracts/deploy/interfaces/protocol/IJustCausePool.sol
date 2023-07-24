@@ -15,7 +15,7 @@ interface IJustCausePool {
     * @param _erc721Addr address of nft contract for pool.
     * @param _isVerified indicates whether JCP is verified
     **/
-    function initialize(address[] memory _acceptedTokens, string memory _name, string memory _about, string memory _picHash, string memory _metaUri, address _receiver, address _poolAddressesProviderAddr, address _wethGatewayAddr, address _erc721Addr, bool _isVerified) external;
+    function initialize(address[] memory _acceptedTokens, string calldata _name, string calldata _about, string calldata _picHash, string calldata _metaUri, address _receiver, address _poolAddressesProviderAddr, address _wethGatewayAddr, address _erc721Addr, bool _isVerified) external;
 
     /**
     * @notice Only called by PoolTracker.
@@ -51,12 +51,12 @@ interface IJustCausePool {
     /**
     * @param _about new about reference for pool
     **/
-    function setAbout(string memory _about) external;
+    function setAbout(string calldata _about) external;
 
     /**
     * @param _metaUri updated metaUri reference for pool
     **/
-    function setMetaUri(string memory _metaUri) external;
+    function setMetaUri(string calldata _metaUri) external;
 
     /**
     * @return acceptedTokens List of tokens to be accepted by JCP.
@@ -66,22 +66,22 @@ interface IJustCausePool {
     /**
     * @return name String name of JCP.
     **/
-    function getName() external view returns(string memory);
+    function getName() external view returns(string calldata);
 
     /**
     * @return about ipfs hash of pool description of JCP.
     **/
-    function getAbout() external view returns(string memory);
+    function getAbout() external view returns(string calldata);
 
     /**
     * @return picHash ipfs hash of pic of JCP.
     **/
-    function getPicHash() external view returns(string memory);
+    function getPicHash() external view returns(string calldata);
 
     /**
     * @return metaUri meta info uri for nft of JCP.
     **/
-    function getMetaUri() external view returns(string memory);
+    function getMetaUri() external view returns(string calldata);
 
     /**
     * @return isVerified indicates whether JCP is verified
@@ -108,7 +108,7 @@ interface IJustCausePool {
     * @return receiver address of receiver of JCP donations.
     * @return isVerified indicates whether JCP is verified
     **/
-    function getPoolInfo() external view returns (address[] memory, address, bool, string memory, string memory, string memory, string memory);
+    function getPoolInfo() external view returns (address[] memory, address, bool, string calldata, string calldata, string calldata, string calldata);
 
     /**
     * @param _assetAddress The address of the underlying asset of the reserve

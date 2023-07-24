@@ -132,7 +132,7 @@ contract JustCausePool is Initializable {
     * @param _isVerified indicates whether JCP is verified
     **/
     function initialize(
-        address[] memory _acceptedTokens,
+        address[] calldata _acceptedTokens,
         string memory _name,
         string memory _about,
         string memory _picHash,
@@ -143,7 +143,7 @@ contract JustCausePool is Initializable {
         address _erc721Addr,
         bool _isVerified
 
-    ) external strLength(_name, 30) initializer() {
+    ) external strLength(_name, 60) initializer() {
 
         require(isBase == false, "Cannot initialize base");
         require(receiver == address(0), "Initialize already called");
@@ -270,17 +270,15 @@ contract JustCausePool is Initializable {
 
     /**
     * @param _about new about reference for pool
-    * @param _metaUri updated metaUri reference for pool
     **/
-    function setAbout(string memory _about, string memory _metaUri) external onlyReceiver(){
+    function setAbout(string calldata _about) external onlyReceiverOrPoolTrackerVerified(){
         about = _about;
-        metaUri = _metaUri;
     }
 
     /**
     * @param _metaUri updated metaUri reference for pool
     **/
-    function setMetaUri(string memory _metaUri) external onlyReceiver(){
+    function setMetaUri(string calldata _metaUri) external onlyReceiverOrPoolTrackerVerified(){
         metaUri = _metaUri;
     }
 

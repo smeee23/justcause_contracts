@@ -49,7 +49,7 @@ contract PoolTracker is ReentrancyGuard {
     mapping(address => address[]) private contributors;
     mapping(address => address[]) private receivers;
     address[] private verifiedPools;
-    uint256[5] fees;
+    uint256[7] fees;
     uint256 bpFee;
     address immutable multiSig;
 
@@ -124,13 +124,13 @@ contract PoolTracker is ReentrancyGuard {
         poolAddressesProviderAddr =  _poolAddressesProviderAddr;
         wethGatewayAddr = address(_wethGatewayAddr);
 
-        fees = [0, 10, 20, 30, 40];
-        bpFee = fees[2];
+        fees = [0, 20, 50, 80, 100, 120, 150];
+        bpFee = fees[1];
     }
 
     /**
     * @dev Emit AddDeposit
-    * @param _asset The address of the underlying asset of the reserve
+    * @param _asset The address of the underlying asset of t he reserve
     * @param _amount The amount of supplied assets
     * @param _pool address of JCP
     * @param _isETH bool indicating if asset is the base token of network (eth/matic/...)
@@ -215,7 +215,7 @@ contract PoolTracker is ReentrancyGuard {
     * @param _receiver address of receiver of JCP donations.
     **/
     function createJCPoolClone(
-        address[] memory _acceptedTokens,
+        address[] calldata _acceptedTokens,
         string memory _name,
         string memory _about,
         string memory _picHash,
@@ -250,6 +250,10 @@ contract PoolTracker is ReentrancyGuard {
 
         isPool[jcpChild] = true;
         emit AddPool(jcpChild, _name, _receiver);
+    }
+
+    function setAboutVerified(address _pool, string calldata _about) public onlyMultiSig() {
+        IJustCausePool(_pool).setAbout(_about);
     }
 
     /**
@@ -354,7 +358,7 @@ contract PoolTracker is ReentrancyGuard {
     * @param _name string name of pool
     * @return pool address of a given pool name
     **/
-    function getAddressFromName(string memory _name) external view returns(address){
+    function getAddressFromName(string calldata _name) external view returns(address){
         return names[_name];
     }
 }

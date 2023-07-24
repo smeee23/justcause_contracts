@@ -58,8 +58,8 @@ contract("JustCausePool", async (accounts) => {
         );
     });
 
-    it("JustCausePool initialize reverts if name is over 30 characters", async() => {
-        const name = "Test Pool gpiorgjt uhoioi oioix";
+    it("JustCausePool initialize reverts if name is over 60 characters", async() => {
+        const name = "Test Pool gpiorgjt uhoioi oioix Test Pool gpiorgjt uhoioi ores";
         await expectRevert(
             this.poolTracker.createJCPoolClone([this.testToken.address], name, "ABOUT_HASH", "picHash", "metaUri", receiver, {from: multiSig}),
             "VM Exception while processing transaction: reverted with reason string 'string over character limit'"
@@ -175,14 +175,14 @@ contract("JustCausePool", async (accounts) => {
         assert.strictEqual(receiverBalance.toString(), paidInterest, "receiver did not receive donations");
     });
 
-    it("JustCausePool setAbout reverts if anyone besides the receiver calls ", async() => {
+    it("JustCausePool setAbout for verified pool reverts if anyone besides the receiver or multisig calls", async() => {
         await this.poolTracker.createJCPoolClone([this.testToken.address, this.testToken_2.address], "Test Pool", "ABOUT_HASH", "picHash", "metaUri", receiver, {from: multiSig})
         const knownAddress = (await this.poolTracker.getVerifiedPools())[0];
         const jCPool = await JustCausePool.at(knownAddress);
 
         await expectRevert(
-            jCPool.setAbout("NEW_ABOUT", {from: multiSig}),
-            "not the receiver"
+            jCPool.setAbout("NEW_ABOUT", {from: owner}),
+            "not authorized"
         );
     });
 
@@ -203,8 +203,8 @@ contract("JustCausePool", async (accounts) => {
         const jCPool = await JustCausePool.at(knownAddress);
 
         await expectRevert(
-            jCPool.setMetaUri("NEW_META_URI", {from: multiSig}),
-            "not the receiver"
+            jCPool.setMetaUri("NEW_META_URI", {from: owner}),
+            "not authorized"
         );
     });
 
