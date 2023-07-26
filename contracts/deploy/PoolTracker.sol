@@ -60,6 +60,8 @@ contract PoolTracker is ReentrancyGuard {
     event AddDeposit(address userAddr, address pool, address asset, uint256 amount);
     event WithdrawDeposit(address userAddr, address pool, address asset, uint256 amount);
     event Claim(address userAddr, address receiver, address pool, address asset, uint256 amount);
+    event UpdateAbout(address pool);
+    event UpdateMetaUri(address pool);
 
     /**
     * @dev Only address that are a pool can be passed to functions marked by this modifier.
@@ -70,9 +72,21 @@ contract PoolTracker is ReentrancyGuard {
     }
 
     /**
+    * @dev Only address that are a pool receiver or multiSig on verified pools can call.
+    **/
+    modifier onlyAuthorizedChange(address _pool){
+        require(
+            IJustCausePool(_pool).getRecipient() == msg.sender || 
+            (IJustCausePool(_pool).getIsVerified() && msg.sender == multiSig),
+            "not authorized"
+        );
+        _;
+    }
+
+    /**
     * @dev Only tokens that are accepted by Aave can be used in JCP creation
     **/
-    modifier onlyAcceptedTokens(address[] memory causeAcceptedTokens){
+    modifier onlyAcceptedTokens(address[] calldata causeAcceptedTokens){
         require(causeAcceptedTokens.length <= 10, "token list must be 10 or less");
         address poolAddr = IPoolAddressesProvider(poolAddressesProviderAddr).getPool();
         address[] memory aaveAcceptedTokens = IPool(poolAddr).getReservesList();
@@ -252,8 +266,28 @@ contract PoolTracker is ReentrancyGuard {
         emit AddPool(jcpChild, _name, _receiver);
     }
 
-    function setAboutVerified(address _pool, string calldata _about) public onlyMultiSig() {
+    function updatePoolAbout(
+        address _pool, 
+        string calldata _about
+    ) 
+        public 
+        onlyPools(_pool)
+        onlyAuthorizedChange(_pool)  
+    {
         IJustCausePool(_pool).setAbout(_about);
+        emit UpdateAbout(msg.sender);
+    }
+
+    function updatePoolMetaUri(
+        address _pool, 
+        string calldata _metaUri
+    ) 
+        public 
+        onlyPools(_pool)
+        onlyAuthorizedChange(_pool) 
+    {
+        IJustCausePool(_pool).setMetaUri(_metaUri);
+        emit UpdateMetaUri(msg.sender);
     }
 
     /**

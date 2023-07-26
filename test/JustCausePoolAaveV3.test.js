@@ -175,14 +175,14 @@ contract("JustCausePool", async (accounts) => {
         assert.strictEqual(receiverBalance.toString(), paidInterest, "receiver did not receive donations");
     });
 
-    it("JustCausePool setAbout for verified pool reverts if anyone besides the receiver or multisig calls", async() => {
+    it("JustCausePool setAbout reverts if anyone besides PoolTracker calls", async() => {
         await this.poolTracker.createJCPoolClone([this.testToken.address, this.testToken_2.address], "Test Pool", "ABOUT_HASH", "picHash", "metaUri", receiver, {from: multiSig})
         const knownAddress = (await this.poolTracker.getVerifiedPools())[0];
         const jCPool = await JustCausePool.at(knownAddress);
 
         await expectRevert(
             jCPool.setAbout("NEW_ABOUT", {from: owner}),
-            "not authorized"
+            "not the owner"
         );
     });
 
@@ -190,21 +190,22 @@ contract("JustCausePool", async (accounts) => {
         await this.poolTracker.createJCPoolClone([this.testToken.address, this.testToken_2.address], "Test Pool", "ABOUT_HASH", "picHash", "metaUri", receiver, {from: multiSig})
         const knownAddress = (await this.poolTracker.getVerifiedPools())[0];
         const jCPool = await JustCausePool.at(knownAddress);
-        await jCPool.setAbout("NEW_ABOUT", {from: receiver});
+
+        await this.poolTracker.updatePoolAbout(knownAddress, "NEW_ABOUT", {from: receiver});
 
         const testAbout = await jCPool.getAbout();
         assert.strictEqual(testAbout, "NEW_ABOUT", "about not updated");
 
     });
 
-    it("JustCausePool setMetaUri reverts if anyone besides the receiver calls it", async() => {
+    it("JustCausePool setMetaUri reverts if anyone besides the PoolTracker calls it", async() => {
         await this.poolTracker.createJCPoolClone([this.testToken.address, this.testToken_2.address], "Test Pool", "ABOUT_HASH", "picHash", "metaUri", receiver, {from: multiSig})
         const knownAddress = (await this.poolTracker.getVerifiedPools())[0];
         const jCPool = await JustCausePool.at(knownAddress);
 
         await expectRevert(
             jCPool.setMetaUri("NEW_META_URI", {from: owner}),
-            "not authorized"
+            "not the owner"
         );
     });
 
@@ -212,10 +213,15 @@ contract("JustCausePool", async (accounts) => {
         await this.poolTracker.createJCPoolClone([this.testToken.address, this.testToken_2.address], "Test Pool", "ABOUT_HASH", "picHash", "metaUri", receiver, {from: multiSig})
         const knownAddress = (await this.poolTracker.getVerifiedPools())[0];
         const jCPool = await JustCausePool.at(knownAddress);
-        await jCPool.setMetaUri("NEW_META_URI", {from: receiver});
+        await this.poolTracker.updatePoolMetaUri(knownAddress, "NEW_META_URI", {from: receiver});
 
-        const testMeta = await jCPool.getMetaUri();
+        let testMeta = await jCPool.getMetaUri();
         assert.strictEqual(testMeta, "NEW_META_URI", "metaUri not updated");
+
+        await this.poolTracker.updatePoolMetaUri(knownAddress, "UPDATED_META_URI", {from: multiSig});
+
+        testMeta = await jCPool.getMetaUri();
+        assert.strictEqual(testMeta, "UPDATED_META_URI", "metaUri not updated");
 
     });
 

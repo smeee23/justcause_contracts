@@ -81,16 +81,6 @@ contract JustCausePool is Initializable {
     }
 
     /**
-    * @dev Only Receiver can call functions marked by this modifier.
-    **/
-    modifier onlyReceiverOrPoolTrackerVerified(){
-        require(receiver == msg.sender ||
-                (isVerified && 
-                poolTracker == msg.sender), "not authorized");
-        _;
-    }
-
-    /**
     * @dev Only Master can call functions marked by this modifier.
     **/
     modifier onlyPoolTracker(){
@@ -271,14 +261,24 @@ contract JustCausePool is Initializable {
     /**
     * @param _about new about reference for pool
     **/
-    function setAbout(string calldata _about) external onlyReceiverOrPoolTrackerVerified(){
+    function setAbout(
+        string calldata _about
+    ) 
+        external
+        onlyPoolTracker
+    {
         about = _about;
     }
 
     /**
     * @param _metaUri updated metaUri reference for pool
     **/
-    function setMetaUri(string calldata _metaUri) external onlyReceiverOrPoolTrackerVerified(){
+    function setMetaUri(
+        string calldata _metaUri
+    ) 
+        external
+        onlyPoolTracker
+    {
         metaUri = _metaUri;
     }
 
