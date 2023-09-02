@@ -13,6 +13,7 @@ const { expectRevert } = require('@openzeppelin/test-helpers');
 contract("JustCausePool", async (accounts) => {
 
     const [multiSig, depositor, owner, receiver] = accounts;
+    const feeIndex = 1;
 
     beforeEach(async() => {
         this.testToken = await TestToken.new();
@@ -32,7 +33,7 @@ contract("JustCausePool", async (accounts) => {
 
         const poolAddressesProviderAddr = this.poolAddressesProviderMock.address;
         const wethGatewayAddr = this.wethGateway.address;
-        this.poolTracker = await PoolTracker.new(poolAddressesProviderAddr, wethGatewayAddr, multiSig);
+        this.poolTracker = await PoolTracker.new(poolAddressesProviderAddr, wethGatewayAddr, multiSig, feeIndex);
         this.INTEREST = "1000000000000000000";
         this.RESERVE_NORMALIZED_INCOME = "7755432354";
         this.LIQUIDITY_INDEX = "1234"
@@ -186,7 +187,7 @@ contract("JustCausePool", async (accounts) => {
         );
     });
 
-    it("JustCausePool setAbout changes state variable to new about", async() => {
+    it("JustCausePool setAbout changes state variable to new about for verified pool", async() => {
         await this.poolTracker.createJCPoolClone([this.testToken.address, this.testToken_2.address], "Test Pool", "ABOUT_HASH", "picHash", "metaUri", receiver, {from: multiSig})
         const knownAddress = (await this.poolTracker.getVerifiedPools())[0];
         const jCPool = await JustCausePool.at(knownAddress);
@@ -196,6 +197,40 @@ contract("JustCausePool", async (accounts) => {
         const testAbout = await jCPool.getAbout();
         assert.strictEqual(testAbout, "NEW_ABOUT", "about not updated");
 
+    });
+
+    it("JustCausePool setAbout changes state variable to new about non-verified pool", async() => {
+        const receipt = await this.poolTracker.createJCPoolClone([this.testToken.address, this.testToken_2.address], "Test Pool", "ABOUT_HASH", "picHash", "metaUri", receiver, {from: receiver})
+        const knownAddress = receipt.logs[0].args["pool"];
+        const jCPool = await JustCausePool.at(knownAddress);
+
+        await this.poolTracker.updatePoolAbout(knownAddress, "NEW_ABOUT", {from: receiver});
+
+        const testAbout = await jCPool.getAbout();
+        assert.strictEqual(testAbout, "NEW_ABOUT", "about not updated");
+
+    });
+
+    it("JustCausePool setAbout changes state if multiSig calls if verified pool", async() => {
+        await this.poolTracker.createJCPoolClone([this.testToken.address, this.testToken_2.address], "Test Pool", "ABOUT_HASH", "picHash", "metaUri", receiver, {from: multiSig})
+        const knownAddress = (await this.poolTracker.getVerifiedPools())[0];
+        const jCPool = await JustCausePool.at(knownAddress);
+
+        await this.poolTracker.updatePoolAbout(knownAddress, "NEW_ABOUT", {from: multiSig});
+
+        const testAbout = await jCPool.getAbout();
+        assert.strictEqual(testAbout, "NEW_ABOUT", "about not updated");
+
+    });
+
+    it("JustCausePool setAbout reverts multiSig calls on non-verified pool", async() => {
+        const receipt = await this.poolTracker.createJCPoolClone([this.testToken.address, this.testToken_2.address], "Test Pool", "ABOUT_HASH", "picHash", "metaUri", receiver, {from: receiver})
+        const poolAddress = receipt.logs[0].args["pool"];
+
+        await expectRevert(
+            this.poolTracker.updatePoolAbout(poolAddress, "NEW_ABOUT", {from: multiSig}),
+            "not authorized"
+        );
     });
 
     it("JustCausePool setMetaUri reverts if anyone besides the PoolTracker calls it", async() => {

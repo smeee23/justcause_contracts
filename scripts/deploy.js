@@ -46,6 +46,7 @@ async function main(){
       poolAddressesProviderAddr: "0x4EEE0BB72C2717310318f27628B3c8a708E4951C",
       wethGatewayAddr: "0xeaDF3f9870b296cB5E86aA085d4339944c6789f3",
       multiSig: "0x78726673245fdb56425c8bd782f6FaA3E447625A",
+      feeIndex: 1,
     };
   }
   const PoolTracker =  await hre.ethers.getContractFactory("PoolTracker");
@@ -53,6 +54,7 @@ async function main(){
     networkConfig.poolAddressesProviderAddr, 
     networkConfig.wethGatewayAddr, 
     networkConfig.multiSig,
+    networkConfig.feeIndex,
   );
 
   await followTransaction(poolTracker.deploymentTransaction().hash);

@@ -56,7 +56,7 @@ contract PoolTracker is ReentrancyGuard {
     address immutable poolAddressesProviderAddr;
     address immutable wethGatewayAddr;
 
-    event AddPool(address pool, string name, address receiver);
+    event AddPool(address pool, string name, address receiver, address[] acceptedTokens, bool isVerified, address nftAddr);
     event AddDeposit(address userAddr, address pool, address asset, uint256 amount);
     event WithdrawDeposit(address userAddr, address pool, address asset, uint256 amount);
     event Claim(address userAddr, address receiver, address pool, address asset, uint256 amount);
@@ -86,7 +86,7 @@ contract PoolTracker is ReentrancyGuard {
     /**
     * @dev Only tokens that are accepted by Aave can be used in JCP creation
     **/
-    modifier onlyAcceptedTokens(address[] calldata causeAcceptedTokens){
+    modifier onlyAcceptedTokens(address[] memory causeAcceptedTokens){
         require(causeAcceptedTokens.length <= 10, "token list must be 10 or less");
         address poolAddr = IPoolAddressesProvider(poolAddressesProviderAddr).getPool();
         address[] memory aaveAcceptedTokens = IPool(poolAddr).getReservesList();
@@ -130,7 +130,7 @@ contract PoolTracker is ReentrancyGuard {
     /**
     * @dev Constructor.
     */
-    constructor (address _poolAddressesProviderAddr, address _wethGatewayAddr, address _multiSig) {
+    constructor (address _poolAddressesProviderAddr, address _wethGatewayAddr, address _multiSig, uint8 _feeIndex) {
         multiSig = _multiSig;
         baseJCPool = new JustCausePool();
         baseERC721 = new JCDepositorERC721();
@@ -139,7 +139,7 @@ contract PoolTracker is ReentrancyGuard {
         wethGatewayAddr = address(_wethGatewayAddr);
 
         fees = [0, 20, 50, 80, 100, 120, 150];
-        bpFee = fees[1];
+        bpFee = fees[_feeIndex];
     }
 
     /**
@@ -229,7 +229,7 @@ contract PoolTracker is ReentrancyGuard {
     * @param _receiver address of receiver of JCP donations.
     **/
     function createJCPoolClone(
-        address[] calldata _acceptedTokens,
+        address[] memory _acceptedTokens,
         string memory _name,
         string memory _about,
         string memory _picHash,
@@ -263,7 +263,7 @@ contract PoolTracker is ReentrancyGuard {
         names[_name] =  jcpChild;
 
         isPool[jcpChild] = true;
-        emit AddPool(jcpChild, _name, _receiver);
+        emit AddPool(jcpChild, _name, _receiver, _acceptedTokens, isVerified, erc721Child);
     }
 
     function updatePoolAbout(
@@ -291,7 +291,7 @@ contract PoolTracker is ReentrancyGuard {
     }
 
     /**
-    * @param feeKey accepts 0 - 4 as keys to set the fixed rate of fees
+    * @param feeKey accepts 0 - 6 as keys to set the fixed rate of fees
     **/
     function setBpFee(uint256 feeKey) public onlyMultiSig() {
         bpFee = fees[feeKey];

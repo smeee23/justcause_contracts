@@ -14,6 +14,7 @@ const BN = web3.utils.BN;
 contract("Pool Tracker", async (accounts) => {
 
     const [multiSig, depositor, owner, receiver] = accounts;
+    const feeIndex = 1;
 
     beforeEach(async() => {
         this.testToken = await TestToken.new();
@@ -33,7 +34,7 @@ contract("Pool Tracker", async (accounts) => {
 
         const poolAddressesProviderAddr = this.poolAddressesProviderMock.address;
         const wethGatewayAddr = this.wethGateway.address;
-        this.poolTracker = await PoolTracker.new(poolAddressesProviderAddr, wethGatewayAddr, multiSig);
+        this.poolTracker = await PoolTracker.new(poolAddressesProviderAddr, wethGatewayAddr, multiSig, feeIndex);
         this.INTEREST = "1000000000000000000";
     });
 
