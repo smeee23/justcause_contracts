@@ -1,5 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("@nomiclabs/hardhat-truffle5");
+require("@nomicfoundation/hardhat-verify");
 
 const { networks } = require("./networks")
 
@@ -43,5 +44,8 @@ module.exports = {
   },
   mocha: {
     timeout: 200000, // 200 seconds max for running tests
+  },
+  etherscan: {
+    apiKey: "T8XJQ27ZDDDR9YN9WQBKJR8Q6EGJ4EMHKG"
   },
 };
