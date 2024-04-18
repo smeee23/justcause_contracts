@@ -36,6 +36,13 @@ module.exports = {
     },*/
     ...networks,
   },
+
+  etherscan: {
+    //abritrum
+    apiKey: "1CVTWICNSWKHJY73C35GC3JY8JWWNQW7S9"
+    //optimism
+    //apiKey: "T8XJQ27ZDDDR9YN9WQBKJR8Q6EGJ4EMHKG"
+  },
   paths: {
     sources: "./contracts",
     tests: "./test",
@@ -44,8 +51,5 @@ module.exports = {
   },
   mocha: {
     timeout: 200000, // 200 seconds max for running tests
-  },
-  etherscan: {
-    apiKey: "T8XJQ27ZDDDR9YN9WQBKJR8Q6EGJ4EMHKG"
   },
 };
